@@ -9,9 +9,12 @@ function Reset(props) {
     )
 }
 
+
+
 function Square(props) {
     return (
-        <button className="square" onClick={props.onClick}>
+        <button className={"square " + (props.value === null ? 'unclicked' : 'clicked ' +
+        (props.value === 'X' ? 'clickedX' : 'clickedO'))}  onClick={props.onClick}>
             {props.value}
         </button>
     );
@@ -25,7 +28,20 @@ class Board extends React.Component {
             squares: Array(9).fill(null),
             xIsNext: true,
             nbCoup: 0,
+            pointX: 0,
+            pointO: 0,
+            matchNul: 0,
+
         };
+    }
+
+    resetScore() {
+        this.reset();
+        this.setState({
+            pointX: 0,
+            pointO: 0,
+            matchNul: 0,
+        })
     }
 
     handleClick(i) {
@@ -63,7 +79,7 @@ class Board extends React.Component {
     renderReset() {
         return (
             <Reset
-                onClick={() => this.reset()}
+                onClick={() => this.resetScore()}
             />
         );
     }
@@ -73,18 +89,41 @@ class Board extends React.Component {
         let status;
         if (winner) {
             status = 'Winner: ' + winner;
+            if (winner === 'X'){
+                let pointX = this.state.pointX;
+                pointX++;
+                this.setState({
+                    pointX: pointX,
+                })
+            }else{
+                let pointO = this.state.pointO;
+                pointO++;
+                this.setState({
+                    pointO: pointO,
+                })
+            }
+            this.reset();
         } else if (this.state.nbCoup === 9) {
             status = 'Match Nul';
+            let matchNul = this.state.matchNul;
+            matchNul++;
+            this.setState({
+                matchNul: matchNul,
+            })
+            this.reset();
         }
         else {
             status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
         }
 
-
-
         return (
             <div>
                 <div className="status">{status}</div>
+                <ul>
+                <li>Joueur X: {this.state.pointX}</li>
+                <li>Joueur O: {this.state.pointO}</li>
+                <li>Match nul: {this.state.matchNul}</li>
+                </ul>
                 <div className="board-row">
                     {this.renderSquare(0)}
                     {this.renderSquare(1)}
